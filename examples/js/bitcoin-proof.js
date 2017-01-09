@@ -15799,21 +15799,29 @@ exports.getProof = function (txIds, txIndex) {
     txIndex: txIndex,
     sibling: []
   };
-
+  console.log("txIds.length :%d ", txIds.length);
   var tree = new Array(txIds.length);
   for (var i = 0; i < tree.length; ++i) {
     tree[i] = reverse(new Buffer(txIds[i], 'hex'));
   }
   var target = tree[txIndex];
 
+  //target is
+  //dd059634699e85b51af4964ab97d5e75fb7cd86b748d0ee1c537ca1850101dc7
+  //console.log("The %s jumped over %d tall buildings", reverse(target).toString('hex'), tree.length);
   while (tree.length !== 1) {
+    console.log("newTree:%d", ~~((tree.length + 1) / 2));
+
     var newTree = new Array(~~((tree.length + 1) / 2));
     for (var j = 0; j < tree.length; j += 2) {
       var hash1 = tree[j];
       var hash2 = tree[Math.min(j + 1, tree.length - 1)];
 
       newTree[j / 2] = sha256x2(hash1, hash2);
-
+      console.log("target:%s\nhash1:%s\nhash2:%s\n", reverse(target).toString('hex'), hash1.toString('hex'),hash2.toString('hex'));
+      reverse(target)
+      // reverse(hash1)
+      // reverse(hash2)
       if (isEqual(target, hash1)) {
         proof.sibling.push(reverse(hash2).toString('hex'));
         target = newTree[j / 2];
@@ -15821,6 +15829,7 @@ exports.getProof = function (txIds, txIndex) {
         proof.sibling.push(reverse(hash1).toString('hex'));
         target = newTree[j / 2];
       }
+
     }
 
     tree = newTree;
